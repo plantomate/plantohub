@@ -33,6 +33,7 @@ defmodule Plantohub.MixProject do
       # Dependencies for all targets
       {:circuits_gpio, "~> 0.4"},
       {:circuits_i2c, "~> 0.1"},
+      {:circuits_spi, "~> 0.1"},
       {:nerves_dht, git: "https://github.com/visciang/nerves_dht.git", tag: "1.2.0"},
       {:nerves, "~> 1.7.0", runtime: false},
       {:shoehorn, "~> 0.7.0"},
