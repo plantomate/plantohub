@@ -31,23 +31,22 @@ defmodule Plantohub do
   end
 
   def probe_soil do
-    {:ok, ref} = Circuits.SPI.open("spidev0.0")
-    {:ok, <<_::size(12), counts::size(12)>>} = Circuits.SPI.transfer(ref, <<0x60, 0x00, 0x00>>)
-    rel = counts / 4095 * 100
-    Logger.info("Relative dryness is #{rel}%")
-    # {:ok, output_gpio} = GPIO.open(@output_pin, :output)
-    # Circuits.GPIO.set_pull_mode(output_gpio, :pulldown)
-    # GPIO.write(output_gpio, 1)
-    # spawn(fn -> toggle_pin_forever(output_gpio) end)
+    {:ok, ref} = Circuits.SPI.open("spidev0.0", mode: 0, )
+    {:ok, <<_::size(12), counts::size(12)>>} = Circuits.SPI.transfer(ref, <<0b00000110, 0b01000000, 0x00>>)
+    rel = 100 - map_range(counts, {1400, 3700}, {0, 100})
+    vol = counts / 4096 * 3.3
+    Logger.info("Counts: #{counts}")
+    Logger.info("Relative humidity: #{rel}%")
+    Logger.info("Voltage: #{vol}V")
+  end
+
+  defp map_range(x, {in_min, in_max}, {out_min, out_max}) do
+    (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
   end
 
   def probe_air do
     {:ok, humidity, temp} = NervesDHT.read(:dht22, @air_sensor_pin)
     Logger.info("Air temp: #{temp}C, humidity: #{humidity}%")
-    # {:ok, output_gpio} = GPIO.open(@output_pin, :output)
-    # Circuits.GPIO.set_pull_mode(output_gpio, :pulldown)
-    # GPIO.write(output_gpio, 1)
-    # spawn(fn -> toggle_pin_forever(output_gpio) end)
   end
 
   # defp toggle_pin_forever(output_gpio) do
